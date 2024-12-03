@@ -1,0 +1,44 @@
+.nav-link.active {
+	background-color: rgb(111, 106, 247);
+	color: white;
+	border-radius: 3px;
+	padding: 8px 12px;
+}
+.navbar-nav-scroll {
+    --bs-scroll-height: 100px;
+}
+
+.nav-link {
+    cursor: pointer;
+}
+
+.nav-link.inactive {
+    background-color: rgb(237, 242, 250); 
+    color: #6c757d; 
+}
+
+.nav-item {
+	margin-right: 10px;
+}
+
+.normal {
+	color: black;
+}
+
+.red {
+	color: red;
+}
+
+.green {
+	color: green;
+}
+
+hr {
+    margin-top: 0 !important;
+}
+
+@media (max-width: 1142px) { 
+    .nav-item {
+        margin-bottom: 10px; 
+    }
+}

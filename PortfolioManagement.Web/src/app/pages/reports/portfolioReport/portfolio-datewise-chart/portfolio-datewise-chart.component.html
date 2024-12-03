@@ -1,0 +1,20 @@
+<div class="card tile-panel w-100">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-9">
+                <h5 class="float-start">Portfolio Datewise Chart</h5>
+            </div>
+            <div class="col-md-3 d-flex flex-column flex-sm-row align-items-center gap-2">
+                <input type="date" class="form-control form-control-sm" (change)="onDateChange()"
+                    [ngModel]="portfolioDatewiseParameterModel.fromDate | date:'yyyy-MM-dd'"
+                    (ngModelChange)="portfolioDatewiseParameterModel.fromDate= $event" id="fromDate" name="fromDate" />
+                <span class="d-block d-sm-inline"> to </span>
+                <input type="date" class="form-control form-control-sm" (change)="onDateChange()"
+                    [ngModel]="portfolioDatewiseParameterModel.toDate | date:'yyyy-MM-dd'"
+                    (ngModelChange)="portfolioDatewiseParameterModel.toDate= $event" id="toDate" name="toDate" />
+            </div>
+        </div>
+        <hr class="m-0 mb-3" />
+        <div echarts [options]="lineChartOption"></div>
+    </div>
+</div>

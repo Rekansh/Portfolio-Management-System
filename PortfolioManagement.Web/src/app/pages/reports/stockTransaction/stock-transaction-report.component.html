@@ -1,0 +1,247 @@
+<div class="card tile-panel w-100">
+    <div class="card-header">
+        <h4 style="display: contents ;" class="card-title mb-0">Stock Transaction Report</h4>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <form #SearchtransactionForm="ngForm" novalidate>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="accountName" class="form-label">Account Name</label>
+                                    <select class="form-select shadow-sm"(change)="onAccountChange()"  [(ngModel)]="transactionParameter.accountId" id="inAccount" name="accountId">
+                                        <option  value="0">Select an Account</option>
+                                        <option *ngFor="let account of stockTransactionListModel.accounts" [value]="account.id">
+                                            {{ account.name }}
+                                        </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="brokerName" class="form-label">Broker Name</label>
+                                    <select class="form-select shadow-sm" [(ngModel)]="transactionParameter.brokerId" id="inBroker" name="inBroker">
+                                    <option   value="0">Select an Broker</option>
+                                        <option *ngFor="let broker of filteredBrokers" [value]="broker.id">
+                                            {{ broker.name }}
+                                        </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="inTransactionType" class="form-label">Transaction Type</label>
+                                    <select class="form-select shadow-sm" [(ngModel)]="transactionParameter.transactionTypeId" id="inTransactionType" name="inTransactionType">
+                                        <option value="0">Select a Transaction Type</option>
+                                        <option *ngFor="let type of masterValues" [value]="type.value">
+                                            {{ type.valueText }}
+                                        </option>
+                                    </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="inScript" class="form-label">Script</label>
+                                <input
+                                        id="script-dropdown"
+                                        type="text"
+                                        class="form-select  shadow-sm"
+                                        [(ngModel)]="selectedScript"
+                                        [ngbTypeahead]="searchScript"
+                                        [inputFormatter]="formatter"
+                                        [resultFormatter]="formatter"
+                                        [editable]="false"
+                                        name="script-dropdown"
+                                        (selectItem)="onScriptSelected($event)"
+                                        placeholder="Search Script"
+                                    />
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="fromDate" class="form-label">From Date</label>
+                                    <input type="date" class="form-control shadow-sm" [(ngModel)]="transactionParameter.fromDate" id="fromDate" name="fromDate" />
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4">
+                            <div class="form-group mb-2">
+                                <label for="toDate" class="form-label">To Date</label>
+                                    <input type="date" class="form-control shadow-sm" [(ngModel)]="transactionParameter.toDate" id="toDate" name="toDate" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2  d-flex flex-column flex-sm-row gap-2">
+                        <button class="btn btn-primary" (click)="search()" [ngClass]="{'btn-outline-primary':!access.canView, 'btn-outline-secondary':!access.canView}" title="{{!(!access.canView) ? 'Click here to search record.' : 'You do not have search access of this page.'}}">Search</button>
+                        <button type="button" class="btn btn-outline-secondary" (click)="reset()">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <hr />
+        <div class="table-scroll">
+            <table class="table table-hover common-table-bordered main-table">
+                <thead>
+                    <tr [id]="'transaction-list'">
+                        <th (click)="sortData('date')" class="sort-header fixed  fixed text-start">
+                            Date
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'date'), 
+                                   'fa-sort-asc': (sortColumn === 'date' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'date' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('accountId')" class="sort-header fixed  text-start">
+                            Account
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'accountId'), 
+                                   'fa-sort-asc': (sortColumn === 'accountId' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'accountId' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('brokerId')" class="sort-header fixed  text-start">
+                            Broker
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'brokerId'), 
+                                   'fa-sort-asc': (sortColumn === 'brokerId' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'brokerId' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('transactionTypeId')" class="sort-header fixed  text-start">
+                            Transaction
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'transactionTypeId'), 
+                                   'fa-sort-asc': (sortColumn === 'transactionTypeId' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'transactionTypeId' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('scriptId')" class="sort-header fixed  text-start">
+                            Script
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'scriptId'), 
+                                   'fa-sort-asc': (sortColumn === 'scriptId' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'scriptId' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('qty')" class="sort-header fixed  text-end">
+                            Quantity
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'qty'), 
+                                   'fa-sort-asc': (sortColumn === 'qty' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'qty' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('price')" class="sort-header fixed  text-end">
+                            Price
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'price'), 
+                                   'fa-sort-asc': (sortColumn === 'price' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'price' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('brokerage')" class="sort-header fixed  text-end">
+                            Brokerage
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'brokerage'), 
+                                   'fa-sort-asc': (sortColumn === 'brokerage' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'brokerage' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('buy')" class="sort-header fixed  text-end">
+                            Buy
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'buy'), 
+                                   'fa-sort-asc': (sortColumn === 'buy' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'buy' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('sell')" class="sort-header fixed  text-end">
+                            Sell
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'sell'), 
+                                   'fa-sort-asc': (sortColumn === 'sell' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'sell' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                        
+                        <th (click)="sortData('dividend')" class="sort-header fixed  text-end">
+                            Dividend
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'dividend'), 
+                                   'fa-sort-asc': (sortColumn === 'dividend' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'dividend' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of stocks;" (click)="transactionParameter.id == item.id;"
+                        [ngClass]="{'selected-row': (transactionParameter.id == item.id)}">
+                        <td class="text-start">{{item.date | date:'shortDate'}}</td>
+                        <td class="text-start">{{item.accountName}}</td>
+                        <td class="text-start">{{item.brokerName}}</td>
+                        <td class="text-start">{{item.transactionTypeName}}</td>
+                        <td (click)="redirect(item.scriptId,item.scriptName)" class="text-start cursor-pointer">{{item.scriptName}}</td>
+                        <td class="text-end">{{item.qty }}</td>
+                        <td class="text-end">{{item.price | number: '1.2-2'}}</td>
+                        <td class="text-end">{{item.brokerage | number: '1.2-2'}}</td>
+                        <td class="text-end">{{item.buy | number: '1.2-2'}}</td>
+                        <td class="text-end">{{item.sell | number: '1.2-2'}}</td>
+                        <td class="text-end">{{item.dividend | number: '1.2-2'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+    </div>
+</div>
+    <div class="card-footer text-body-secondary">
+        <div class="float-start total-records">Total Record(s) <strong>{{this.stocks.length}}</strong></div>
+    </div>
+</div>

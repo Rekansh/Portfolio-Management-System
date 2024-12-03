@@ -1,0 +1,275 @@
+<div *ngIf="isPortfolioReport">
+    <div class="row mb-2">
+        <div class="col-md-10 col-8">
+            <h4 class="float-start">Portfolio Report</h4>
+        </div>
+        <div class="col-md-2 col-4">
+            <button type="button" class="btn btn-outline-secondary float-end filterButton" [ngbPopover]="popContent" [popoverTitle]="popTitle" triggers="manual" #popover="ngbPopover" (click)="popover.toggle()" placement="bottom-right" [autoClose]="'outside'">
+                <i class="bi bi-funnel-fill"></i>
+            </button>
+        </div>
+    </div>
+</div>
+  
+<div *ngIf="!isPortfolioReport">
+    <div class="row mb-2">
+        <div class="col-md-10 col-8">
+            <h4 class="float-start">Dashboard</h4>
+        </div>
+        <div class="col-md-2 col-4">
+            <button type="button" class="btn btn-outline-secondary float-end filterButton" [ngbPopover]="popContent" [popoverTitle]="popTitle" triggers="manual" #popover="ngbPopover" (click)="popover.toggle()" placement="bottom-right" [autoClose]="'outside'">
+                <i class="bi bi-funnel-fill"></i>
+            </button>
+        </div>
+    </div>
+</div>
+  
+    <ng-template #popContent>
+        <div class="popover-content">
+        <form>
+            <div class="row align-items-center mb-3">
+              <div class="col-md-3 mb-2">
+                <label>Account</label>
+              </div>
+
+                <div class="col-md-12">
+                    <select class="form-select" (change)="onAccountChange()" [(ngModel)]="transactionParameter.accountId" id="inAccount" name="accountId">
+                      <option *ngFor="let account of stockTransactionListModel.accounts" [value]="account.id">{{ account.name }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-2 align-items-center mb-3">
+                <div class="col-md-12 mb-2">
+                    <label>Broker</label>
+                </div>
+            <div class="col-md-12">
+                <select class="form-select" [(ngModel)]="transactionParameter.brokerId" id="inBroker" name="inBroker">
+                <option *ngFor="let broker of stockTransactionListModel.brokers" [value]="broker.id">{{ broker.name }}</option>
+                </select>
+            </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-primary" (click)="search()">Search</button>
+                    <button type="button" class="btn btn-outline-secondary" (click)="reset()">Reset</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    </ng-template>
+    
+    <ng-template #popTitle>Filters</ng-template>
+  
+<div class="card-body">
+    <div class="row">
+    <div class="col-md-4" *ngIf="isShowChart">
+        <div class="card tile-panel ">
+        <div class="card-body pb-0">
+            <h5 class="card-title">Sector-wise Allocation</h5>
+            <hr />
+            <ng-container *ngIf="investmentSectorData && investmentSectorData.length > 0; else noDataMessage">
+            <app-portfoilo-report-chart [chartData]="investmentSectorData"></app-portfoilo-report-chart>
+            </ng-container>
+            <ng-template #noDataMessage>
+            <p>No data available for sector-wise allocation.</p>
+            </ng-template>
+        </div>
+        </div>
+    </div>
+
+    <div class="col-md-4" *ngIf="isShowChart">
+        <div class="card tile-panel ">
+        <div class="card-body pb-0">
+            <h5 class="card-title">Market-wise Allocation</h5>
+            <hr />
+            <ng-container *ngIf="marketSectorData && marketSectorData.length > 0; else noMarketDataMessage">
+            <app-portfoilo-report-chart [chartData]="marketSectorData"></app-portfoilo-report-chart>
+            </ng-container>
+            <ng-template #noMarketDataMessage>
+            <p>No data available for market-wise allocation.</p>
+            </ng-template>
+        </div>
+        </div>
+    </div>
+
+    <div class="col-md-4" *ngIf="isShowChart">
+        <div class="card tile-panel summary">
+        <div class="card-body pb-0">
+            <h5 class="card-title">Summary</h5>
+            <hr />
+            <app-portfolio-report-summary [portfolioReportModels]="portfolioReportModels"></app-portfolio-report-summary>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+  
+  <div class="card tile-panel w-100">
+    <div class="card-body">
+      <h5 class="card-title">Stocks Equity </h5><hr />
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table class="table table-hover common-table-bordered main-table">
+            <thead>
+                <tr>
+                    <th (click)="sortData('scriptName')" class="sort-header text-start fixed">
+                        Stock
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'scriptName'),
+                               'fa-sort-asc': (sortColumn === 'scriptName' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'scriptName' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('qty')" class="sort-header text-end fixed">
+                        Quantity
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'qty'),
+                               'fa-sort-asc': (sortColumn === 'qty' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'qty' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('costPrice')" class="sort-header text-end fixed">
+                        Avg. Price
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'costPrice'),
+                               'fa-sort-asc': (sortColumn === 'costPrice' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'costPrice' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('currentPrice')" class="sort-header text-end fixed">
+                        LTP
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'currentPrice'),
+                               'fa-sort-asc': (sortColumn === 'currentPrice' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'currentPrice' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('investmentAmount')" class="sort-header text-end fixed">
+                        Inv. Amt
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'investmentAmount'),
+                               'fa-sort-asc': (sortColumn === 'investmentAmount' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'investmentAmount' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('marketValue')" class="sort-header text-end fixed">
+                        Mkt. Val
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'marketValue'),
+                               'fa-sort-asc': (sortColumn === 'marketValue' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'marketValue' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('overallGLAmount')" class="sort-header text-end fixed">
+                        Overall G/L
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'overallGLAmount'),
+                               'fa-sort-asc': (sortColumn === 'overallGLAmount' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'overallGLAmount' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('overallGLPercentage')" class="sort-header text-end fixed">
+                        Overall G/L %
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'overallGLPercentage'),
+                               'fa-sort-asc': (sortColumn === 'overallGLPercentage' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'overallGLPercentage' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('dayGLAmount')" class="sort-header text-end fixed">
+                        Day G/L
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'dayGLAmount'),
+                               'fa-sort-asc': (sortColumn === 'dayGLAmount' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'dayGLAmount' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('dayGLPercentage')" class="sort-header text-end fixed">
+                        Day G/L %
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'dayGLPercentage'),
+                               'fa-sort-asc': (sortColumn === 'dayGLPercentage' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'dayGLPercentage' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                    <th (click)="sortData('releasedProfit')" class="sort-header text-end fixed">
+                        Realized Profit
+                        <i class="fa"
+                           [ngClass]="{
+                               'fa-sort': (sortColumn !== 'releasedProfit'),
+                               'fa-sort-asc': (sortColumn === 'releasedProfit' && sortDirection === 'asc'),
+                               'fa-sort-desc': (sortColumn === 'releasedProfit' && sortDirection === 'desc')
+                           }"
+                           aria-hidden="true">
+                        </i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of portfolioReportModels.scripts" 
+                  (click)="transactionParameter.id = item.accountId" 
+                  [ngClass]="{'selected-row': (transactionParameter.id === item.accountId)}">
+                <td (click)="redirect(item.scriptId, item.scriptName)" class="text-start cursor-pointer">
+                  {{ item.scriptName }}
+                </td>
+                <td class="text-end fixed">{{ item.qty }}</td>
+                <td class="text-end fixed">{{ item.costPrice | number: '1.2-2' }}</td>
+                <td class="text-end fixed">{{ item.currentPrice | number: '1.2-2' }}</td>
+                <td class="text-end fixed">{{ item.investmentAmount | number: '1.2-2' }}</td>
+                <td class="text-end fixed">{{ item.marketValue | number: '1.2-2' }}</td>
+                <td class="text-end fixed" [ngClass]="{ 'green': item.overallGLAmount > 0, 'red': item.overallGLAmount < 0 }">
+                  {{ item.overallGLAmount | number: '1.2-2' }}
+                </td>
+                <td class="text-end fixed" [ngClass]="{ 'green': item.overallGLPercentage > 0, 'red': item.overallGLPercentage < 0 }">
+                  {{ item.overallGLPercentage | number: '1.2-2' }}%
+                </td>
+                <td class="text-end fixed" [ngClass]="{ 'green': item.dayGLAmount > 0, 'red': item.dayGLAmount < 0 }">
+                  {{ item.dayGLAmount | number: '1.2-2' }}
+                </td>
+                <td class="text-end fixed" [ngClass]="{ 'green': item.dayGLPercentage > 0, 'red': item.dayGLPercentage < 0 }">
+                  {{ item.dayGLPercentage | number: '1.2-2' }}%
+                </td>
+                <td class="text-end fixed">{{ item.releasedProfit | number: '1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mt-3">
+    <app-portfolio-datewise-chart [accountId]="myAccountId" [brokerId]="myBrokerId"></app-portfolio-datewise-chart>
+  </div>

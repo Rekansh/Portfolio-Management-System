@@ -1,0 +1,148 @@
+<div class="card tile-panel w-100">
+    <div class="card-body">
+        <h5 class="float-start">Analytics Report</h5> <br>
+        <hr>
+        <div class="table-scroll">
+            <table class="table table-hover common-table-bordered main-table">
+                <thead>
+                    <tr>
+                        <th class="sort-header text-start"  (click)="sortData('scriptName')">
+                            Script
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'scriptName'), 
+                                   'fa-sort-asc': (sortColumn === 'scriptName' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'scriptName' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+
+                        <th class="sort-header text-end"  (click)="sortData('price')">
+                            Price
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'price'), 
+                                   'fa-sort-asc': (sortColumn === 'price' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'price' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+
+                        <th class="sort-header text-end"  (click)="sortData('percentageChange')">
+                            Change %
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'percentageChange'), 
+                                   'fa-sort-asc': (sortColumn === 'percentageChange' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'percentageChange' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    
+                        <th class="sort-header text-end" (click)="sortData('volume')">
+                            Volume
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'volume'), 
+                                   'fa-sort-asc': (sortColumn === 'volume' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'volume' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    
+                        <th class="sort-header text-end" (click)="sortData('weekVolumeAverage')">
+                            Week Volume Average
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'weekVolumeAverage'), 
+                                   'fa-sort-asc': (sortColumn === 'weekVolumeAverage' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'weekVolumeAverage' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    
+                        <th class="sort-header text-end" (click)="sortData('weekVolumePercentage')">
+                            Week Volume %
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'weekVolumePercentage'), 
+                                   'fa-sort-asc': (sortColumn === 'weekVolumePercentage' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'weekVolumePercentage' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    
+                        <th class="sort-header text-end" (click)="sortData('monthVolumeAverage')">
+                            Month Volume Average
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'monthVolumeAverage'), 
+                                   'fa-sort-asc': (sortColumn === 'monthVolumeAverage' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'monthVolumeAverage' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    
+                        <th class="sort-header text-end" (click)="sortData('monthVolumePercentage')">
+                            Month Volume %
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'monthVolumePercentage'), 
+                                   'fa-sort-asc': (sortColumn === 'monthVolumePercentage' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'monthVolumePercentage' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    
+                        <th class="sort-header text-end">
+                            News
+                            <i class="fa"
+                               [ngClass]="{
+                                   'fa-sort': (sortColumn !== 'news'), 
+                                   'fa-sort-asc': (sortColumn === 'news' && sortDirection === 'asc'), 
+                                   'fa-sort-desc': (sortColumn === 'news' && sortDirection === 'desc')
+                               }"
+                               aria-hidden="true">
+                            </i>
+                        </th>
+                    </tr>
+                    
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of volumeGrid.volumes">
+                        <td 
+                            class="cursor-pointer text-start" 
+                            title="{{ item.scriptName }}" 
+                            (click)="redirect(item.scriptId, item.scriptName)"
+                        >
+                            {{ item.scriptName }}
+                        </td>
+
+                        <td class="text-end"> 
+                            <span *ngIf="item.priceChange > 0" class="text-success">{{ item.price | currency : 'INR' : 'symbol': '1.2-2' }}</span>
+                            <span *ngIf="item.priceChange < 0" class="text-danger">{{ item.price | currency : 'INR' : 'symbol': '1.2-2' }}</span></td>
+                        <td class="text-end"><span class="percentage-change d-block">
+                            <i *ngIf="item.priceChange > 0" class="bi bi-arrow-up-circle-fill text-success me-1"></i>
+                            <i *ngIf="item.priceChange < 0" class="bi bi-arrow-down-circle-fill text-danger me-1"></i>
+                            ({{item.priceChange | number }} | {{item.percentageChange | number}} %)
+                        </span></td>
+                        <td class="text-end">{{ item.volume | numberSuffix }}</td>
+                        <td class="text-end">{{ item.weekVolumeAverage  | numberSuffix }}</td>
+                        <td class="text-end">{{ item.weekVolumePercentage  | number:'1.0-0'}}</td>
+                        <td class="text-end">{{ item.monthVolumeAverage  | numberSuffix }}</td>
+                        <td class="text-end">{{ item.monthVolumePercentage  | number:'1.0-0' }}</td>
+                        <td class="text-end">{{ item.newsCount  | number:'1.0-0' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+	</div>
+</div>
