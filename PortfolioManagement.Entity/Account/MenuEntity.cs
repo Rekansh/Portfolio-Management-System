@@ -1,8 +1,4 @@
-﻿
-
-using PortfolioManagement.Entity.Master;
-
-namespace PortfolioManagement.Entity.Account
+﻿namespace PortfolioManagement.Entity.Account
 {
     /// <summary>
     /// This class having main entities of table Menu

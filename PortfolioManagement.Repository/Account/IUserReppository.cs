@@ -1,10 +1,5 @@
 ﻿using PortfolioManagement.Entity.Master;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Repository.Account
 {
@@ -27,11 +22,11 @@ namespace PortfolioManagement.Repository.Account
         public  Task Delete(long Id);
         public  Task<int> UserUpdate(UserUpdateEntity userUpdateEntity);
         public  Task<UserLoginEntity> ValidateLogin(UserEntity userEntity);
-        public  Task<UserEntity> ResetPassword(string UsernameEmail);
         public  Task<bool> UpdateActive(UserEntity userEntity);
         public  Task<bool> UpdatePassword(UserEntity userEntity);
         public  Task<bool> ChangePassword(UserEntity userEntity);
         public  Task<bool> UpdatePasswordDirect(UserEntity userEntity);
+        public Task<UserEntity> ResetPassword(string UsernameEmail);
 
     }
 }

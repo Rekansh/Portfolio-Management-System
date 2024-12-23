@@ -1,15 +1,10 @@
 ﻿using CommonLibrary;
 using CommonLibrary.SqlDB;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Account;
 using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Repository.Account;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Master
 {
@@ -463,8 +458,6 @@ namespace PortfolioManagement.Business.Master
             else
                 return false;
         }
-       
-
 
         public async Task<bool> UpdatePasswordDirect(UserEntity userEntity)
         {
@@ -474,6 +467,12 @@ namespace PortfolioManagement.Business.Master
             sql.AddParameter("PasswordSalt", sPasswordSalt.ToEncrypt());
             sql.AddParameter("LastUpdateDateTime", userEntity.LastUpdateDateTime);
             return MyConvert.ToBoolean(await sql.ExecuteScalarAsync("User_UpdatePasswordDirect", CommandType.StoredProcedure));
+        }
+
+        public async Task<UserEntity> ResetPassword(string UsernameEmail)
+        {
+            sql.AddParameter("UsernameEmail", UsernameEmail);
+            return await sql.ExecuteRecordAsync<UserEntity>("User_SelectForResetPassword", CommandType.StoredProcedure);
         }
 
         #endregion

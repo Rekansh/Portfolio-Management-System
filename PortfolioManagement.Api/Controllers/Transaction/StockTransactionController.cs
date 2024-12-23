@@ -11,7 +11,7 @@ using PortfolioManagement.Repository.Transaction;
 
 namespace PortfolioManagement.Api.Controllers.Transaction
 {
-    [Route("stockTransaction/stockTransaction")]
+    [Route("transaction/stockTransaction")]
     [ApiController]
     public class StockTransactionController : ControllerBase
     {

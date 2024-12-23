@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PortfolioManagement.Entity.Account
+﻿namespace PortfolioManagement.Entity.Account
 {
     /// <summary>   
     /// This class having entities of table RoleMenuAccess   
