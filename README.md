@@ -37,7 +37,7 @@ The Stock Market Portfolio Management System is a comprehensive application desi
 ### Frontend Setup
 1. Navigate to the frontend directory:
     ```bash
-    cd PortfolioManagement_UI
+    cd PortfolioManagement.Web
     ```
 2. Install the Angular dependencies:
     ```bash
