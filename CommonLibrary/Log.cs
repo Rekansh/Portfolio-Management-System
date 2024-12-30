@@ -1,4 +1,4 @@
-﻿using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
 using log4net;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -392,8 +392,8 @@ namespace CommonLibrary
 
         private static ISql SetSql(string errorId, Exception exception, long userId)
         {
-            CreateSql oCreateSQL = new CreateSql(Configuration);
-            ISql sql = oCreateSQL.CreateSqlInstance(ErrorConnectionStringKey);
+            SqlFactory sqlFactory = new SqlFactory(Configuration);
+            ISql sql = sqlFactory.CreateInstance(ErrorConnectionStringKey);
 
             sql.AddParameter("Id", 0);
             sql.AddParameter("ErrorId", errorId);

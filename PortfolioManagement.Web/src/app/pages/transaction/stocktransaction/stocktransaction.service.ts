@@ -10,7 +10,7 @@ export class StocktransactionService {
 	}
 
 	public getRecord(id: number): Observable<StockTransactionModel> {
-		return this.http.get('stockTransaction/stockTransaction/getRecord/' + id).pipe(
+		return this.http.get('transaction/stockTransaction/getRecord/' + id).pipe(
 			map((response: StockTransactionModel) => {
 				return response;
 			})
@@ -18,7 +18,7 @@ export class StocktransactionService {
 	}
 
 	public getForLOV(transactionParameter: StockTransactionParameterModel): Observable<StockTransactionModel[]> {
-		return this.http.post('stockTransaction/stockTransaction/getLovValue', transactionParameter).pipe(
+		return this.http.post('transaction/stockTransaction/getLovValue', transactionParameter).pipe(
 			map((response: StockTransactionModel[]) => {
 				return response;
 			}),
@@ -27,7 +27,7 @@ export class StocktransactionService {
 	
 
 	public getForGrid(transactionParameter: StockTransactionParameterModel): Observable<StockTransactionGridModel> {
-		return this.http.post('stockTransaction/stockTransaction/getGridData', transactionParameter).pipe(
+		return this.http.post('transaction/stockTransaction/getGridData', transactionParameter).pipe(
 			map((response: StockTransactionGridModel) => {
 				return response;
 			}),
@@ -38,13 +38,13 @@ export class StocktransactionService {
 
 	public save(transaction: StockTransactionModel): Observable<number> {
 		if (transaction.id === 0)
-			return this.http.post('stockTransaction/stockTransaction/insert', transaction).pipe(
+			return this.http.post('transaction/stockTransaction/insert', transaction).pipe(
 				map((response: number) => {
 					return response;
 				}),
 			);
 		else
-			return this.http.post('stockTransaction/stockTransaction/update', transaction).pipe(
+			return this.http.post('transaction/stockTransaction/update', transaction).pipe(
 				map((response: number) => {
 					return response;
 				}),
@@ -52,7 +52,7 @@ export class StocktransactionService {
 	}
 	
 	public delete(id: number): Observable<void> {
-		return this.http.post('stockTransaction/stockTransaction/delete/' + id, null).pipe(
+		return this.http.post('transaction/stockTransaction/delete/' + id, null).pipe(
 			map((response: void) => {
 				return response;
 			}),
@@ -60,7 +60,7 @@ export class StocktransactionService {
 	}
 
     public getForList(transactionParameter: StockTransactionParameterModel): Observable<StockTransactionListModel> {
-		return this.http.post('stockTransaction/stockTransaction/getForList', transactionParameter).pipe(
+		return this.http.post('transaction/stockTransaction/getForList', transactionParameter).pipe(
 			map((response: StockTransactionListModel) => {
 				return response;
 			}),
@@ -68,7 +68,7 @@ export class StocktransactionService {
 	}
 
     public getForReport(transactionParameter: StockTransactionParameterModel): Observable<StockTransactionModel[]> {
-		return this.http.post('stockTransaction/stockTransaction/getReportData', transactionParameter).pipe(
+		return this.http.post('transaction/stockTransaction/getReportData', transactionParameter).pipe(
 			map((response: StockTransactionModel[]) => {
 				return response;
 			}),
@@ -76,7 +76,7 @@ export class StocktransactionService {
 	}
 
 	public getForSummery(transactionParameter: StockTransactionParameterModel): Observable<StockTransactionSummaryModel[]> {
-		return this.http.post('stockTransaction/stockTransaction/getSummaryData', transactionParameter).pipe(
+		return this.http.post('transaction/stockTransaction/getSummaryData', transactionParameter).pipe(
 			map((response: StockTransactionSummaryModel[]) => {
 				return response;
 			}),

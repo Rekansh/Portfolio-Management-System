@@ -1,17 +1,12 @@
 ﻿using CommonLibrary;
 using Microsoft.Extensions.Configuration;
+using PortfolioManagement.Business.Master;
+using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Entity.Transaction;
+using PortfolioManagement.Repository.Transaction;
 using ScrapySharp.Network;
 using StockMarketBusiness.Transaction.Json;
-using PortfolioManagement.Entity.Master;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
-using PortfolioManagement.Business.Master;
-using System.Runtime.Caching;
-using PortfolioManagement.Repository.Transaction;
 
 namespace PortfolioManagement.Business.Transaction
 {

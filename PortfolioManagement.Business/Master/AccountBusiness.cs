@@ -1,5 +1,5 @@
 ﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Repository.Master;
@@ -54,12 +54,8 @@ namespace PortfolioManagement.Business.Master
 
         public async Task<AccountGridEntity> SelectForGrid(AccountParameterEntity accountParameterEntity)
         {
-            AccountGridEntity accountGridEntity = new AccountGridEntity();
-
-            if (!string.IsNullOrEmpty(accountParameterEntity.Name))
-            {
+            if (MyConvert.ToString(accountParameterEntity.Name) != string.Empty)
                 sql.AddParameter("Name", accountParameterEntity.Name);
-            }
             sql.AddParameter("SortExpression", accountParameterEntity.SortExpression);
             sql.AddParameter("SortDirection", accountParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", accountParameterEntity.PageIndex);
@@ -67,9 +63,7 @@ namespace PortfolioManagement.Business.Master
             if(accountParameterEntity.PmsId != 0)
             sql.AddParameter("PmsId", accountParameterEntity.PmsId);
 
-
-            await sql.ExecuteEnumerableMultipleAsync<AccountGridEntity>("Account_SelectForGrid", CommandType.StoredProcedure, 2, accountGridEntity, MapGridEntity);
-            return accountGridEntity;
+            return await sql.ExecuteResultSetAsync<AccountGridEntity>("Account_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
         /// Maps data for Account grid entity.
         public async Task MapGridEntity(int resultSet, AccountGridEntity accountGridEntity, IDataReader reader)
@@ -77,7 +71,7 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    accountGridEntity.Accounts.Add(await sql.MapDataDynamicallyAsync<AccountEntity>(reader));
+                    accountGridEntity.Accounts.Add(await sql.MapDataAsync<AccountEntity>(reader));
                     break;
                 case 1:
                     accountGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);
@@ -86,34 +80,26 @@ namespace PortfolioManagement.Business.Master
         }
         public async Task<AccountAddEntity> SelectForAdd(AccountParameterEntity accountParameterEntity)
         {
-            AccountAddEntity accountAddEntity = new AccountAddEntity();
-
             sql.AddParameter("Id", accountParameterEntity.Id);
             sql.AddParameter("PmsId", accountParameterEntity.PmsId);
 
-            await sql.ExecuteEnumerableMultipleAsync<AccountAddEntity>(
-                "Account_SelectForAdd", CommandType.StoredProcedure, 1, accountAddEntity, MapAddEntity);
-            return accountAddEntity;
+            return await sql.ExecuteResultSetAsync<AccountAddEntity>("Account_SelectForAdd", CommandType.StoredProcedure, 1, MapAddEntity);
         }
         public async Task MapAddEntity(int resultSet, AccountAddEntity accountAddEntity, IDataReader reader)
         {
             switch (resultSet)
             {
                 case 0:
-                    accountAddEntity.Brockers.Add(await sql.MapDataDynamicallyAsync<AccountBrokerSelectEntity>(reader));
+                    accountAddEntity.Brockers.Add(await sql.MapDataAsync<AccountBrokerSelectEntity>(reader));
                     break;
             }
         }
         public async Task<AccountEditEntity> SelectForEdit(AccountParameterEntity accountParameterEntity)
         {
-            AccountEditEntity accountEditEntity = new AccountEditEntity();
-
             sql.AddParameter("Id", accountParameterEntity.Id);
             sql.AddParameter("PmsId", accountParameterEntity.PmsId);
 
-            await sql.ExecuteEnumerableMultipleAsync<AccountEditEntity>(
-                "Account_SelectForEdit", CommandType.StoredProcedure, 2, accountEditEntity, MapEditEntity);
-            return accountEditEntity;
+            return await sql.ExecuteResultSetAsync<AccountEditEntity>("Account_SelectForEdit", CommandType.StoredProcedure, 2, MapEditEntity);
         }
         /// Maps data for Account grid entity.
         public async Task MapEditEntity(int resultSet, AccountEditEntity accountEditEntity, IDataReader reader)
@@ -121,10 +107,10 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 1:
-                    accountEditEntity.Account.Brokers.Add(await sql.MapDataDynamicallyAsync<AccountBrokerSelectEntity>(reader));
+                    accountEditEntity.Account.Brokers.Add(await sql.MapDataAsync<AccountBrokerSelectEntity>(reader));
                     break;
                 case 0:
-                    accountEditEntity.Account = await sql.MapDataDynamicallyAsync<AccountEntity>(reader);
+                    accountEditEntity.Account = await sql.MapDataAsync<AccountEntity>(reader);
                     break;
             }
         }

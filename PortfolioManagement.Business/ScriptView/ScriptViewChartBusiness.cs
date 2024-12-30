@@ -1,18 +1,10 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
-using DocumentFormat.OpenXml.Drawing;
+﻿using AdvancedADO;
+using CommonLibrary;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Entity.ScriptView;
-using PortfolioManagement.Entity.Transaction;
-using PortfolioManagement.Entity.Transaction.StockTransaction;
 using PortfolioManagement.Repository.ScriptView;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.ScriptView
 {
@@ -45,12 +37,11 @@ namespace PortfolioManagement.Business.ScriptView
 
         public async Task<ScriptViewChartEntity> SelectForChart(ScriptViewParameterEntity scriptViewParameterEntity)
         {
-            ScriptViewChartEntity scriptViewChartEntity = new ScriptViewChartEntity();
             sql.AddParameter("ScriptId", scriptViewParameterEntity.ScriptId);
             sql.AddParameter("FromDate", DbType.DateTime, ParameterDirection.Input , scriptViewParameterEntity.FromDate);
             sql.AddParameter("ToDate",DbType.DateTime, ParameterDirection.Input, scriptViewParameterEntity.ToDate);
 
-            await sql.ExecuteEnumerableMultipleAsync<ScriptViewChartEntity>("ScriptView_SelectForChart", CommandType.StoredProcedure , 2, scriptViewChartEntity, mapData);
+            ScriptViewChartEntity scriptViewChartEntity = await sql.ExecuteResultSetAsync<ScriptViewChartEntity>("ScriptView_SelectForChart", CommandType.StoredProcedure , 2, mapData);
 
             FilterPrices(scriptViewChartEntity, scriptViewParameterEntity);
             return scriptViewChartEntity;
@@ -83,7 +74,7 @@ namespace PortfolioManagement.Business.ScriptView
                     scriptViewChartEntity.Script = MapScriptMain(reader);
                     break;
                 case 1:
-                    scriptViewChartEntity.Prices.Add(await sql.MapDataDynamicallyAsync<ScriptViewPriceEntity>(reader));
+                    scriptViewChartEntity.Prices.Add(await sql.MapDataAsync<ScriptViewPriceEntity>(reader));
                     break;
             }
         }

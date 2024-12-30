@@ -1,14 +1,9 @@
-﻿using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
 using CommonLibrary;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Master;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PortfolioManagement.Repository.Master;
+using System.Data;
 
 namespace PortfolioManagement.Business.Master
 {
@@ -104,10 +99,7 @@ namespace PortfolioManagement.Business.Master
         /// <returns>SplitBonus grid data</returns>
         public async Task<SplitBonusGridEntity> SelectForGrid()
         {
-            SplitBonusGridEntity splitBonusGridEntity = new SplitBonusGridEntity();
-            await sql.ExecuteEnumerableMultipleAsync<SplitBonusGridEntity>("SplitBonus_SelectForGrid", CommandType.StoredProcedure, 2, splitBonusGridEntity, MapGridEntity);
-            return splitBonusGridEntity;
-
+            return await sql.ExecuteResultSetAsync<SplitBonusGridEntity>("SplitBonus_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         /// <summary>
@@ -121,7 +113,7 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    splitBonusGridEntity.SplitBonuss.Add(await sql.MapDataDynamicallyAsync<SplitBonusEntity>(reader));
+                    splitBonusGridEntity.SplitBonuss.Add(await sql.MapDataAsync<SplitBonusEntity>(reader));
                     break;
                 case 1:
                     splitBonusGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

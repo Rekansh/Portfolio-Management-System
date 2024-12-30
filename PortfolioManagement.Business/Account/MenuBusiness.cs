@@ -1,5 +1,5 @@
 ﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Account;
 using PortfolioManagement.Repository.Account;
@@ -95,10 +95,7 @@ namespace PortfolioManagement.Business.Account
         /// <returns>Add modes all LOVs data</returns>
         public async Task<MenuAddEntity> SelectForAdd(MenuParameterEntity menuParameterEntity)
         {
-            MenuAddEntity menuAddEntity = new MenuAddEntity();
-
-            await sql.ExecuteEnumerableMultipleAsync<MenuAddEntity>("Menu_SelectForAdd", CommandType.StoredProcedure, 1, menuAddEntity, MapAddEntity);
-            return menuAddEntity;
+            return await sql.ExecuteResultSetAsync<MenuAddEntity>("Menu_SelectForAdd", CommandType.StoredProcedure, 1, MapAddEntity);
         }
 
         /// <summary>
@@ -112,7 +109,7 @@ namespace PortfolioManagement.Business.Account
             switch (resultSet)
             {
                 case 0:
-                    menuAddEntity.Menus.Add(await sql.MapDataDynamicallyAsync<MenuMainEntity>(reader));
+                    menuAddEntity.Menus.Add(await sql.MapDataAsync<MenuMainEntity>(reader));
                     break;
             }
         }
@@ -124,10 +121,8 @@ namespace PortfolioManagement.Business.Account
         /// <returns>Edit modes all LOVs data and edit record information</returns>
         public async Task<MenuEditEntity> SelectForEdit(MenuParameterEntity menuParameterEntity)
         {
-            MenuEditEntity menuEditEntity = new MenuEditEntity();
             sql.AddParameter("Id", menuParameterEntity.Id);
-            await sql.ExecuteEnumerableMultipleAsync<MenuEditEntity>("Menu_SelectForEdit", CommandType.StoredProcedure, 2, menuEditEntity, MapEditEntity);
-            return menuEditEntity;
+            return await sql.ExecuteResultSetAsync<MenuEditEntity>("Menu_SelectForEdit", CommandType.StoredProcedure, 2, MapEditEntity);
         }
 
         /// <summary>
@@ -141,10 +136,10 @@ namespace PortfolioManagement.Business.Account
             switch (resultSet)
             {
                 case 0:
-                    menuEditEntity.Menu = await sql.MapDataDynamicallyAsync<MenuEntity>(reader);
+                    menuEditEntity.Menu = await sql.MapDataAsync<MenuEntity>(reader);
                     break;
                 case 1:
-                    menuEditEntity.Menus.Add(await sql.MapDataDynamicallyAsync<MenuMainEntity>(reader));
+                    menuEditEntity.Menus.Add(await sql.MapDataAsync<MenuMainEntity>(reader));
                     break;
 
             }
@@ -157,7 +152,6 @@ namespace PortfolioManagement.Business.Account
         /// <returns>Menu grid data</returns>
         public async Task<MenuGridEntity> SelectForGrid(MenuParameterEntity menuParameterEntity)
         {
-            MenuGridEntity menuGridEntity = new MenuGridEntity();
             if (menuParameterEntity.Name != string.Empty)
                 sql.AddParameter("Name", menuParameterEntity.Name);
             if (menuParameterEntity.ParentId != 0)
@@ -167,8 +161,7 @@ namespace PortfolioManagement.Business.Account
             sql.AddParameter("SortDirection", menuParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", menuParameterEntity.PageIndex);
             sql.AddParameter("PageSize", menuParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<MenuGridEntity>("Menu_SelectForGrid", CommandType.StoredProcedure, 2, menuGridEntity, MapGridEntity);
-            return menuGridEntity;
+            return await sql.ExecuteResultSetAsync<MenuGridEntity>("Menu_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         /// <summary>
@@ -182,7 +175,7 @@ namespace PortfolioManagement.Business.Account
             switch (resultSet)
             {
                 case 0:
-                    menuGridEntity.Menus.Add(await sql.MapDataDynamicallyAsync<MenuEntity>(reader));
+                    menuGridEntity.Menus.Add(await sql.MapDataAsync<MenuEntity>(reader));
                     break;
                 case 1:
                     menuGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

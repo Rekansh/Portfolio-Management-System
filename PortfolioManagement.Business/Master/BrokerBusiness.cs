@@ -1,14 +1,9 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
+using CommonLibrary;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Repository.Master;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Master
 {
@@ -70,12 +65,8 @@ namespace PortfolioManagement.Business.Master
 
         public async Task<BrokerGridEntity> SelectForGrid(BrokerParameterEntity brokerParameterEntity)
         {
-            BrokerGridEntity brokerGridEntity = new BrokerGridEntity();
-
-            if (brokerParameterEntity.Name != String.Empty)
-            {
+            if (MyConvert.ToString(brokerParameterEntity.Name) != String.Empty)
                 sql.AddParameter("Name", brokerParameterEntity.Name);
-            }
             sql.AddParameter("SortExpression", brokerParameterEntity.SortExpression);
             sql.AddParameter("SortDirection", brokerParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", brokerParameterEntity.PageIndex);
@@ -85,9 +76,7 @@ namespace PortfolioManagement.Business.Master
                 sql.AddParameter("BrokerTypeId", brokerParameterEntity.BrokerTypeId);
 
 
-            await sql.ExecuteEnumerableMultipleAsync<BrokerGridEntity>
-                ("Broker_SelectForGrid", CommandType.StoredProcedure, 2, brokerGridEntity, MapGridEntity);
-            return brokerGridEntity;
+            return await sql.ExecuteResultSetAsync<BrokerGridEntity>("Broker_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         public async Task MapGridEntity(int resultSet, BrokerGridEntity brokerGridEntity, IDataReader reader)
@@ -95,7 +84,7 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    brokerGridEntity.Brokers.Add(await sql.MapDataDynamicallyAsync<BrokerEntity>(reader));
+                    brokerGridEntity.Brokers.Add(await sql.MapDataAsync<BrokerEntity>(reader));
                     break;
                 case 1:
                     brokerGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

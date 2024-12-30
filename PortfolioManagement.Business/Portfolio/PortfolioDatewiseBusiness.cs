@@ -1,9 +1,7 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
+using CommonLibrary;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Business.Master;
-using PortfolioManagement.Entity.Account;
-using PortfolioManagement.Entity.ScriptView;
 using PortfolioManagement.Entity.Transaction;
 using PortfolioManagement.Repository.Portfolio;
 using System.Data;

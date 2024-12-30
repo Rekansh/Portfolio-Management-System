@@ -502,9 +502,9 @@ BEGIN
 	BEGIN
 		SET @AddLovsEntity = @AddLovsEntity + 'public List<' + @Lov + 'MainEntity> ' + @Lov + 's = new List<' + @Lov + 'MainEntity>();' + CHAR(13)
 		
-		SET @MapAddEntity = @MapAddEntity + 'case ' + CONVERT(VARCHAR, @AddEditResultSet) + ':' + CHAR(13) + dbo.fnJavaScriptName(@ClsTableName) + 'AddEntity.' + @Lov + 's.Add(await sql.MapDataDynamicallyAsync<' + @Lov + 'MainEntity>(reader));' + CHAR(13) + 'break;' + CHAR(13)
+		SET @MapAddEntity = @MapAddEntity + 'case ' + CONVERT(VARCHAR, @AddEditResultSet) + ':' + CHAR(13) + dbo.fnJavaScriptName(@ClsTableName) + 'AddEntity.' + @Lov + 's.Add(await sql.MapDataAsync<' + @Lov + 'MainEntity>(reader));' + CHAR(13) + 'break;' + CHAR(13)
 
-		SET @MapEditEntity = @MapEditEntity + 'case ' + CONVERT(VARCHAR, @AddEditResultSet + 1) + ':' + CHAR(13) + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity.' + @Lov + 's.Add(await sql.MapDataDynamicallyAsync<' + @Lov + 'MainEntity>(reader));' + CHAR(13) + 'break;' + CHAR(13)
+		SET @MapEditEntity = @MapEditEntity + 'case ' + CONVERT(VARCHAR, @AddEditResultSet + 1) + ':' + CHAR(13) + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity.' + @Lov + 's.Add(await sql.MapDataAsync<' + @Lov + 'MainEntity>(reader));' + CHAR(13) + 'break;' + CHAR(13)
 		
 		SET @AddLovsSPCall = @AddLovsSPCall + 'EXEC ' + @Lov + '_SelectForLOV ' + @SpSelectForParameterPass + CHAR(13)
 
@@ -537,7 +537,7 @@ BEGIN
 	BEGIN
 		SET @ListLovsEntity = @ListLovsEntity + 'public List<' + @Lov + 'MainEntity> ' + @Lov + 's = new List<' + @Lov + 'MainEntity>();' + CHAR(13)
 		
-		SET @MapListEntity = @MapListEntity + 'case ' + CONVERT(VARCHAR, @ListResultSet) + ':' + CHAR(13) + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity.' + @Lov + 's.Add(await sql.MapDataDynamicallyAsync<' + @Lov + 'MainEntity>(reader));' + CHAR(13) + 'break;' + CHAR(13)
+		SET @MapListEntity = @MapListEntity + 'case ' + CONVERT(VARCHAR, @ListResultSet) + ':' + CHAR(13) + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity.' + @Lov + 's.Add(await sql.MapDataAsync<' + @Lov + 'MainEntity>(reader));' + CHAR(13) + 'break;' + CHAR(13)
 		
 		SET @ListLovsSPCall = @ListLovsSPCall + 'EXEC ' + @Lov + '_SelectForLOV ' + @SpSelectForParameterPass + CHAR(13)
 
@@ -745,7 +745,7 @@ BEGIN
         {
             ' + @ClsTableName + 'AddEntity ' + dbo.fnJavaScriptName(@ClsTableName) + 'AddEntity = new ' + @ClsTableName + 'AddEntity();
             ' + @BusinessParameter + '
-            await sql.ExecuteEnumerableMultipleAsync<' + @ClsTableName + 'AddEntity>("' + @TableName + '_SelectForAdd", CommandType.StoredProcedure, ' + CONVERT(VARCHAR, @AddLOVsCount) + ', ' + dbo.fnJavaScriptName(@ClsTableName) + 'AddEntity, MapAddEntity);
+            await sql.ExecuteResultSetAsync<' + @ClsTableName + 'AddEntity>("' + @TableName + '_SelectForAdd", CommandType.StoredProcedure, ' + CONVERT(VARCHAR, @AddLOVsCount) + ', ' + dbo.fnJavaScriptName(@ClsTableName) + 'AddEntity, MapAddEntity);
             return ' + dbo.fnJavaScriptName(@ClsTableName) + 'AddEntity;
         }
 
@@ -772,7 +772,7 @@ BEGIN
         {
             ' + @ClsTableName + 'EditEntity ' + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity = new ' + @ClsTableName + 'EditEntity();
             ' + @BusinessParameter + '
-            await sql.ExecuteEnumerableMultipleAsync<' + @ClsTableName + 'EditEntity>("' + @TableName + '_SelectForEdit", CommandType.StoredProcedure, ' + CONVERT(VARCHAR, @AddLOVsCount + 1) + ', ' + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity, MapEditEntity);
+            await sql.ExecuteResultSetAsync<' + @ClsTableName + 'EditEntity>("' + @TableName + '_SelectForEdit", CommandType.StoredProcedure, ' + CONVERT(VARCHAR, @AddLOVsCount + 1) + ', ' + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity, MapEditEntity);
             return ' + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity;
         }
 
@@ -787,7 +787,7 @@ BEGIN
             switch (resultSet)
             {
                 case 0:
-                    ' + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity.' + @ClsTableName + ' = await sql.MapDataDynamicallyAsync<' + @ClsTableName + 'Entity>(reader);
+                    ' + dbo.fnJavaScriptName(@ClsTableName) + 'EditEntity.' + @ClsTableName + ' = await sql.MapDataAsync<' + @ClsTableName + 'Entity>(reader);
                     break;
                 ' + @MapEditEntity  + '
             }
@@ -806,7 +806,7 @@ BEGIN
             sql.AddParameter("SortDirection", ' + dbo.fnJavaScriptName(@ClsTableName) + 'ParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", ' + dbo.fnJavaScriptName(@ClsTableName) + 'ParameterEntity.PageIndex);
             sql.AddParameter("PageSize", ' + dbo.fnJavaScriptName(@ClsTableName) + 'ParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<' + @ClsTableName + 'GridEntity>("' + @TableName + '_SelectForGrid", CommandType.StoredProcedure, 2, ' + dbo.fnJavaScriptName(@ClsTableName) + 'GridEntity, MapGridEntity);
+            await sql.ExecuteResultSetAsync<' + @ClsTableName + 'GridEntity>("' + @TableName + '_SelectForGrid", CommandType.StoredProcedure, 2, ' + dbo.fnJavaScriptName(@ClsTableName) + 'GridEntity, MapGridEntity);
             return ' + dbo.fnJavaScriptName(@ClsTableName) + 'GridEntity;
         }
 
@@ -821,7 +821,7 @@ BEGIN
             switch (resultSet)
             {
                 case 0:
-                    ' + dbo.fnJavaScriptName(@ClsTableName) + 'GridEntity.' + @ClsTableName + 's.Add(await sql.MapDataDynamicallyAsync<' + @ClsTableName + 'Entity>(reader));
+                    ' + dbo.fnJavaScriptName(@ClsTableName) + 'GridEntity.' + @ClsTableName + 's.Add(await sql.MapDataAsync<' + @ClsTableName + 'Entity>(reader));
                     break;
                 case 1:
                     ' + dbo.fnJavaScriptName(@ClsTableName) + 'GridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);
@@ -842,7 +842,7 @@ BEGIN
             sql.AddParameter("SortDirection", ' + dbo.fnJavaScriptName(@ClsTableName) + 'ParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", ' + dbo.fnJavaScriptName(@ClsTableName) + 'ParameterEntity.PageIndex);
             sql.AddParameter("PageSize", ' + dbo.fnJavaScriptName(@ClsTableName) + 'ParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<' + @ClsTableName + 'ListEntity>("' + @TableName + '_SelectForList", CommandType.StoredProcedure, ' + CONVERT(VARCHAR, @ListLOVsCount + 2) + ', ' + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity, MapListEntity);
+            await sql.ExecuteResultSetAsync<' + @ClsTableName + 'ListEntity>("' + @TableName + '_SelectForList", CommandType.StoredProcedure, ' + CONVERT(VARCHAR, @ListLOVsCount + 2) + ', ' + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity, MapListEntity);
             return ' + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity;
         }
 
@@ -858,7 +858,7 @@ BEGIN
             {
                 ' + @MapListEntity + '
                 case ' + CONVERT(VARCHAR, @ListLOVsCount) + ':
-                    ' + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity.' + @ClsTableName + 's.Add(await sql.MapDataDynamicallyAsync<' + @ClsTableName + 'Entity>(reader));
+                    ' + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity.' + @ClsTableName + 's.Add(await sql.MapDataAsync<' + @ClsTableName + 'Entity>(reader));
                     break;
                 case ' + CONVERT(VARCHAR, @ListLOVsCount + 1) + ':
                     ' + dbo.fnJavaScriptName(@ClsTableName) + 'ListEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

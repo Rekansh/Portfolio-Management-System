@@ -1,15 +1,8 @@
-﻿using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Index;
-using PortfolioManagement.Entity.ScriptView;
-using PortfolioManagement.Repository.Account;
 using PortfolioManagement.Repository.Index;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Index
 {
@@ -22,16 +15,14 @@ namespace PortfolioManagement.Business.Index
         }
         public async Task<HeaderGridEntity> SelectForGrid()
         {
-            HeaderGridEntity headerGridEntity = new HeaderGridEntity();
-            await sql.ExecuteEnumerableMultipleAsync<HeaderGridEntity>("Index_SelectForNifty50", CommandType.StoredProcedure, 1, headerGridEntity, MapGridEntity);
-            return headerGridEntity;
+            return await sql.ExecuteResultSetAsync<HeaderGridEntity>("Index_SelectForNifty50", CommandType.StoredProcedure, 1, MapGridEntity);
         }
         public async Task MapGridEntity(int resultSet, HeaderGridEntity headerGridEntity, IDataReader reader)
         {
             switch (resultSet)
             {
                 case 0:
-                    headerGridEntity.Nifty50.Add(await sql.MapDataDynamicallyAsync<HeaderNifty50Entity>(reader));
+                    headerGridEntity.Nifty50.Add(await sql.MapDataAsync<HeaderNifty50Entity>(reader));
                     break;
             }
         }

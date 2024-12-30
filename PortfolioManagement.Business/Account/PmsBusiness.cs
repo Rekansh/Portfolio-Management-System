@@ -1,4 +1,4 @@
-﻿using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
 using CommonLibrary;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Account;
@@ -51,7 +51,6 @@ namespace PortfolioManagement.Business.Account
         }
         public async Task<PmsGridEntity> SelectForGrid(PmsParameterEntity pmsParameterEntity)
         {
-            PmsGridEntity pmsGridEntity = new PmsGridEntity();
             if (pmsParameterEntity.Name != string.Empty)
                 sql.AddParameter("Name", pmsParameterEntity.Name);
 
@@ -59,8 +58,7 @@ namespace PortfolioManagement.Business.Account
             sql.AddParameter("SortDirection", pmsParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", pmsParameterEntity.PageIndex);
             sql.AddParameter("PageSize", pmsParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<PmsGridEntity>("PMS_SelectForGrid", CommandType.StoredProcedure, 2, pmsGridEntity, MapGridEntity);
-            return pmsGridEntity;
+            return await sql.ExecuteResultSetAsync<PmsGridEntity>("PMS_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         public async Task MapGridEntity(int resultSet, PmsGridEntity pmsGridEntity, IDataReader reader)
@@ -68,7 +66,7 @@ namespace PortfolioManagement.Business.Account
             switch (resultSet)
             {
                 case 0:
-                    pmsGridEntity.pmss.Add(await sql.MapDataDynamicallyAsync<PmsEntity>(reader));
+                    pmsGridEntity.pmss.Add(await sql.MapDataAsync<PmsEntity>(reader));
                     break;
                 case 1:
                     pmsGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

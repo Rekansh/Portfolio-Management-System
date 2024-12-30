@@ -1,11 +1,9 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
+using CommonLibrary;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Entity.Transaction;
-using System;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Transaction;
 
@@ -47,9 +45,7 @@ public class TransactionBusiness : CommonBusiness
         /// <returns>Add modes all LOVs data</returns>
         public async Task<TransactionAddEntity> SelectForAdd(TransactionParameterEntity transactionParameterEntity)
         {
-            TransactionAddEntity transactionAddEntity = new TransactionAddEntity();
-            await sql.ExecuteEnumerableMultipleAsync<TransactionAddEntity>("Transaction_SelectForAdd", CommandType.StoredProcedure, 4, transactionAddEntity, MapAddEntity);
-            return transactionAddEntity;
+            return await sql.ExecuteResultSetAsync<TransactionAddEntity>("Transaction_SelectForAdd", CommandType.StoredProcedure, 4, MapAddEntity);
         }
 
         /// <summary>
@@ -63,16 +59,16 @@ public class TransactionBusiness : CommonBusiness
             switch (resultSet)
             {
                 case 0:
-                    transactionAddEntity.Accounts.Add(await sql.MapDataDynamicallyAsync<AccountMainEntity>(reader));
+                    transactionAddEntity.Accounts.Add(await sql.MapDataAsync<AccountMainEntity>(reader));
                     break;
                 case 1:
-                    transactionAddEntity.Types.Add(await sql.MapDataDynamicallyAsync<TypeMainEntity>(reader));
+                    transactionAddEntity.Types.Add(await sql.MapDataAsync<TypeMainEntity>(reader));
                     break;
                 case 2:
-                    transactionAddEntity.Scripts.Add(await sql.MapDataDynamicallyAsync<ScriptMainEntity>(reader));
+                    transactionAddEntity.Scripts.Add(await sql.MapDataAsync<ScriptMainEntity>(reader));
                     break;
                 case 3:
-                    transactionAddEntity.Investers.Add(await sql.MapDataDynamicallyAsync<InvesterMainEntity>(reader));
+                    transactionAddEntity.Investers.Add(await sql.MapDataAsync<InvesterMainEntity>(reader));
                     break;
 
             }
@@ -85,10 +81,8 @@ public class TransactionBusiness : CommonBusiness
         /// <returns>Edit modes all LOVs data and edit record information</returns>
         public async Task<TransactionEditEntity> SelectForEdit(TransactionParameterEntity transactionParameterEntity)
         {
-            TransactionEditEntity transactionEditEntity = new TransactionEditEntity();
             sql.AddParameter("Id", transactionParameterEntity.Id);
-            await sql.ExecuteEnumerableMultipleAsync<TransactionEditEntity>("Transaction_SelectForEdit", CommandType.StoredProcedure, 5, transactionEditEntity, MapEditEntity);
-            return transactionEditEntity;
+            return await sql.ExecuteResultSetAsync<TransactionEditEntity>("Transaction_SelectForEdit", CommandType.StoredProcedure, 5, MapEditEntity);
         }
 
         /// <summary>
@@ -102,19 +96,19 @@ public class TransactionBusiness : CommonBusiness
             switch (resultSet)
             {
                 case 0:
-                    transactionEditEntity.Transaction = await sql.MapDataDynamicallyAsync<TransactionEntity>(reader);
+                    transactionEditEntity.Transaction = await sql.MapDataAsync<TransactionEntity>(reader);
                     break;
                 case 1:
-                    transactionEditEntity.Accounts.Add(await sql.MapDataDynamicallyAsync<AccountMainEntity>(reader));
+                    transactionEditEntity.Accounts.Add(await sql.MapDataAsync<AccountMainEntity>(reader));
                     break;
                 case 2:
-                    transactionEditEntity.Types.Add(await sql.MapDataDynamicallyAsync<TypeMainEntity>(reader));
+                    transactionEditEntity.Types.Add(await sql.MapDataAsync<TypeMainEntity>(reader));
                     break;
                 case 3:
-                    transactionEditEntity.Scripts.Add(await sql.MapDataDynamicallyAsync<ScriptMainEntity>(reader));
+                    transactionEditEntity.Scripts.Add(await sql.MapDataAsync<ScriptMainEntity>(reader));
                     break;
                 case 4:
-                    transactionEditEntity.Investers.Add(await sql.MapDataDynamicallyAsync<InvesterMainEntity>(reader));
+                    transactionEditEntity.Investers.Add(await sql.MapDataAsync<InvesterMainEntity>(reader));
                     break;
 
             }
@@ -127,7 +121,6 @@ public class TransactionBusiness : CommonBusiness
         /// <returns>Transaction grid data</returns>
         public async Task<TransactionGridEntity> SelectForGrid(TransactionParameterEntity transactionParameterEntity)
         {
-            TransactionGridEntity transactionGridEntity = new TransactionGridEntity();
             if (transactionParameterEntity.Date != DateTime.MinValue)
                 sql.AddParameter("Date", transactionParameterEntity.Date);
             if (transactionParameterEntity.AccountId != 0)
@@ -143,8 +136,7 @@ public class TransactionBusiness : CommonBusiness
             sql.AddParameter("SortDirection", transactionParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", transactionParameterEntity.PageIndex);
             sql.AddParameter("PageSize", transactionParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<TransactionGridEntity>("Transaction_SelectForGrid", CommandType.StoredProcedure, 2, transactionGridEntity, MapGridEntity);
-            return transactionGridEntity;
+            return await sql.ExecuteResultSetAsync<TransactionGridEntity>("Transaction_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         /// <summary>
@@ -158,7 +150,7 @@ public class TransactionBusiness : CommonBusiness
             switch (resultSet)
             {
                 case 0:
-                    transactionGridEntity.Transactions.Add(await sql.MapDataDynamicallyAsync<TransactionEntity>(reader));
+                    transactionGridEntity.Transactions.Add(await sql.MapDataAsync<TransactionEntity>(reader));
                     break;
                 case 1:
                     transactionGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);
@@ -173,7 +165,6 @@ public class TransactionBusiness : CommonBusiness
         /// <returns>Transaction grid data and LOV data</returns>
         public async Task<TransactionListEntity> SelectForList(TransactionParameterEntity transactionParameterEntity)
         {
-            TransactionListEntity transactionListEntity = new TransactionListEntity();
             if (transactionParameterEntity.Date != DateTime.MinValue)
                 sql.AddParameter("Date", transactionParameterEntity.Date);
             if (transactionParameterEntity.AccountId != 0)
@@ -189,8 +180,7 @@ public class TransactionBusiness : CommonBusiness
             sql.AddParameter("SortDirection", transactionParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", transactionParameterEntity.PageIndex);
             sql.AddParameter("PageSize", transactionParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<TransactionListEntity>("Transaction_SelectForList", CommandType.StoredProcedure, 6, transactionListEntity, MapListEntity);
-            return transactionListEntity;
+            return await sql.ExecuteResultSetAsync<TransactionListEntity>("Transaction_SelectForList", CommandType.StoredProcedure, 6, MapListEntity);
         }
 
         /// <summary>
@@ -204,20 +194,20 @@ public class TransactionBusiness : CommonBusiness
             switch (resultSet)
             {
                 case 0:
-                    transactionListEntity.Accounts.Add(await sql.MapDataDynamicallyAsync<AccountMainEntity>(reader));
+                    transactionListEntity.Accounts.Add(await sql.MapDataAsync<AccountMainEntity>(reader));
                     break;
                 case 1:
-                    transactionListEntity.Types.Add(await sql.MapDataDynamicallyAsync<TypeMainEntity>(reader));
+                    transactionListEntity.Types.Add(await sql.MapDataAsync<TypeMainEntity>(reader));
                     break;
                 case 2:
-                    transactionListEntity.Scripts.Add(await sql.MapDataDynamicallyAsync<ScriptMainEntity>(reader));
+                    transactionListEntity.Scripts.Add(await sql.MapDataAsync<ScriptMainEntity>(reader));
                     break;
                 case 3:
-                    transactionListEntity.Investers.Add(await sql.MapDataDynamicallyAsync<InvesterMainEntity>(reader));
+                    transactionListEntity.Investers.Add(await sql.MapDataAsync<InvesterMainEntity>(reader));
                     break;
 
                 case 4:
-                    transactionListEntity.Transactions.Add(await sql.MapDataDynamicallyAsync<TransactionEntity>(reader));
+                    transactionListEntity.Transactions.Add(await sql.MapDataAsync<TransactionEntity>(reader));
                     break;
                 case 5:
                     transactionListEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

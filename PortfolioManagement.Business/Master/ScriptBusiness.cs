@@ -1,12 +1,9 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
+using CommonLibrary;
 using Microsoft.Extensions.Configuration;
-using PortfolioManagement.Business;
 using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Repository.Master;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Master
 {
@@ -117,7 +114,6 @@ namespace PortfolioManagement.Business.Master
         /// <returns>Script grid data</returns>
         public async Task<ScriptGridEntity> SelectForGrid(ScriptParameterEntity scriptParameterEntity)
         {
-            ScriptGridEntity scriptGridEntity = new ScriptGridEntity();
             if (scriptParameterEntity.Id != 0)
                 sql.AddParameter("Id", scriptParameterEntity.Id);
             if (scriptParameterEntity.Name != string.Empty)
@@ -132,8 +128,7 @@ namespace PortfolioManagement.Business.Master
             sql.AddParameter("SortDirection", scriptParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", scriptParameterEntity.PageIndex);
             sql.AddParameter("PageSize", scriptParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<ScriptGridEntity>("Script_SelectForGrid", CommandType.StoredProcedure, 2, scriptGridEntity, MapGridEntity);
-            return scriptGridEntity;
+            return await sql.ExecuteResultSetAsync<ScriptGridEntity>("Script_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         /// <summary>
@@ -147,7 +142,7 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    scriptGridEntity.Scripts.Add(await sql.MapDataDynamicallyAsync<ScriptEntity>(reader));
+                    scriptGridEntity.Scripts.Add(await sql.MapDataAsync<ScriptEntity>(reader));
                     break;
                 case 1:
                     scriptGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

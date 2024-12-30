@@ -1,5 +1,5 @@
 ﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Account;
 using PortfolioManagement.Repository.Account;
@@ -82,7 +82,6 @@ namespace PortfolioManagement.Business.Account
         /// <returns>Role grid data</returns>
         public async Task<RoleGridEntity> SelectForGrid(RoleParameterEntity roleParameterEntity)
         {
-            RoleGridEntity roleGridEntity = new RoleGridEntity();
             if (roleParameterEntity.Name != string.Empty)
                 sql.AddParameter("Name", roleParameterEntity.Name);
 
@@ -90,8 +89,7 @@ namespace PortfolioManagement.Business.Account
             sql.AddParameter("SortDirection", roleParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", roleParameterEntity.PageIndex);
             sql.AddParameter("PageSize", roleParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<RoleGridEntity>("Role_SelectForGrid", CommandType.StoredProcedure, 2, roleGridEntity, MapGridEntity);
-            return roleGridEntity;
+            return await sql.ExecuteResultSetAsync<RoleGridEntity>("Role_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         /// <summary>
@@ -105,7 +103,7 @@ namespace PortfolioManagement.Business.Account
             switch (resultSet)
             {
                 case 0:
-                    roleGridEntity.Roles.Add(await sql.MapDataDynamicallyAsync<RoleEntity>(reader));
+                    roleGridEntity.Roles.Add(await sql.MapDataAsync<RoleEntity>(reader));
                     break;
                 case 1:
                     roleGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

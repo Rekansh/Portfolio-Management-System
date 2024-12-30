@@ -1,4 +1,5 @@
-﻿using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
+using DocumentDBClient;
 using Microsoft.Extensions.Configuration;
 
 namespace PortfolioManagement.Business
@@ -14,6 +15,7 @@ namespace PortfolioManagement.Business
         {
             configuration = config;
             this.ConnectionStringKey = "Default";
+            this.DocumentConnectionStringKey = "DefaultMongoDB";
         }
         public CommonBusiness(IConfiguration config, string connectionStringKey)
         {
@@ -25,18 +27,30 @@ namespace PortfolioManagement.Business
 
         #region public override Properties
         public string ConnectionStringKey { get; set; }
+        public string DocumentConnectionStringKey { get; set; }
         #endregion
 
         #region Private Methods
         public ISql CreateSqlInstance()
         {
-            CreateSql createSql = new CreateSql(configuration);
-            return createSql.CreateSqlInstance(ConnectionStringKey);
+            SqlFactory sqlFactory = new SqlFactory(configuration);
+            return sqlFactory.CreateInstance(ConnectionStringKey);
         }
         public ISql CreateSqlInstance(string connectionStringKey)
         {
-            CreateSql createSql = new CreateSql(configuration);
-            return createSql.CreateSqlInstance(connectionStringKey);
+            SqlFactory sqlFactory = new SqlFactory(configuration);
+            return sqlFactory.CreateInstance(connectionStringKey);
+        }
+
+        public IDocument<TEntity> CreateDocumentInstance<TEntity>(string collectionName) where TEntity : IBaseEntity
+        {
+            DocumentFactory<TEntity> documentFactory = new DocumentFactory<TEntity>(configuration, collectionName);
+            return documentFactory.CreateInstance(DocumentConnectionStringKey);
+        }
+        public IDocument<TEntity> CreateDocumentInstance<TEntity>(string connectionStringKey, string collectionName) where TEntity : IBaseEntity
+        {
+            DocumentFactory<TEntity> documentFactory = new DocumentFactory<TEntity>(configuration, collectionName);
+            return documentFactory.CreateInstance(connectionStringKey);
         }
         #endregion
     }

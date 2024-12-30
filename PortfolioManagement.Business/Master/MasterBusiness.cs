@@ -1,15 +1,9 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
+using CommonLibrary;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Master;
-using PortfolioManagement.Entity.Transaction.StockTransaction;
 using PortfolioManagement.Repository.Master;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Master
 {
@@ -70,10 +64,8 @@ namespace PortfolioManagement.Business.Master
 
         public async Task<MasterEntity> SelectForRecord(short Id)
         {
-            MasterEntity masterEntity = new MasterEntity();
             sql.AddParameter("Id", Id);
-            await sql.ExecuteEnumerableMultipleAsync<MasterEntity>("Master_SelectForRecord", CommandType.StoredProcedure, 2, masterEntity, MapRecordEntity);
-            return masterEntity;
+            return await sql.ExecuteResultSetAsync<MasterEntity>("Master_SelectForRecord", CommandType.StoredProcedure, 2, MapRecordEntity);
         }
 
         private async Task MapRecordEntity(int resultSet, MasterEntity masterEntity, IDataReader reader)
@@ -81,12 +73,12 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    var entity = await sql.MapDataDynamicallyAsync<MasterEntity>(reader);
+                    var entity = await sql.MapDataAsync<MasterEntity>(reader);
                     masterEntity.Id = entity.Id;
                     masterEntity.Type = entity.Type;
                     break;
                 case 1:
-                    masterEntity.MasterValues.Add(await sql.MapDataDynamicallyAsync<MasterValueEntity>(reader));
+                    masterEntity.MasterValues.Add(await sql.MapDataAsync<MasterValueEntity>(reader));
                     break;
             }
         }

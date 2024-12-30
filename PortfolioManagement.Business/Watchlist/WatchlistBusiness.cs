@@ -1,18 +1,9 @@
-﻿using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
 using CommonLibrary;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PortfolioManagement.Entity.Watchlist;
-using PortfolioManagement.Entity.Master;
-using PortfolioManagement.Entity.Transaction.StockTransaction;
-using PortfolioManagement.Entity.Transaction;
-using PortfolioManagement.Entity.Account;
 using PortfolioManagement.Repository.Watchlist;
+using System.Data;
 
 namespace PortfolioManagement.Business.Watchlist
 {

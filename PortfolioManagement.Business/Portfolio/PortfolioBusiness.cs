@@ -1,13 +1,9 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Transaction;
 using PortfolioManagement.Entity.Transaction.StockTransaction;
 using PortfolioManagement.Repository.Portfolio;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Portfolio
 {
@@ -74,7 +70,7 @@ namespace PortfolioManagement.Business.Portfolio
 
         private PortfolioScriptEntity mapPortfolioReportEntity(IDataReader reader)
         {
-            PortfolioScriptEntity record = sql.MapDataDynamically<PortfolioScriptEntity>(reader);
+            PortfolioScriptEntity record = sql.MapData<PortfolioScriptEntity>(reader);
             record.InvestmentAmount = Math.Round(record.Qty * record.CostPrice, 2);
             record.MarketValue = Math.Round(record.Qty * record.CurrentPrice, 2);
             record.OverallGLAmount = Math.Round(record.MarketValue - record.InvestmentAmount, 2);
@@ -123,8 +119,6 @@ namespace PortfolioManagement.Business.Portfolio
             portfolioReportEntity.PortfolioSummary.ReleasedProfit = Math.Round(portfolioReportEntity.Scripts.Sum(x => x.ReleasedProfit), 2);
         }
         #endregion
-
-
 
     }
 

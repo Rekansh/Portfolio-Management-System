@@ -1,14 +1,8 @@
-﻿using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Analysis;
-using PortfolioManagement.Entity.Index;
 using PortfolioManagement.Repository.Analysis;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Analysis
 {
@@ -21,16 +15,14 @@ namespace PortfolioManagement.Business.Analysis
         }
         public async Task<VolumeGridEntity> SelectForVolume()
         {
-            VolumeGridEntity volumeGridEntity = new VolumeGridEntity();
-            await sql.ExecuteEnumerableMultipleAsync<VolumeGridEntity>("Analysis_SelectForVolume", CommandType.StoredProcedure, 1, volumeGridEntity, MapVolumeEntity);
-            return volumeGridEntity;
+            return await sql.ExecuteResultSetAsync<VolumeGridEntity>("Analysis_SelectForVolume", CommandType.StoredProcedure, 1, MapVolumeEntity);
         }
         public async Task MapVolumeEntity(int resultSet, VolumeGridEntity volumeGridEntity, IDataReader reader)
         {
             switch (resultSet)
             {
                 case 0:
-                    volumeGridEntity.Volumes.Add(await sql.MapDataDynamicallyAsync<VolumeEntity>(reader));
+                    volumeGridEntity.Volumes.Add(await sql.MapDataAsync<VolumeEntity>(reader));
                     break;
             }
         }

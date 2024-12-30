@@ -1,5 +1,5 @@
 ﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.Account;
 using PortfolioManagement.Entity.Master;
@@ -121,9 +121,7 @@ namespace PortfolioManagement.Business.Master
         /// <returns>Add modes all LOVs data</returns>
         public async Task<UserAddEntity> SelectForAdd(UserParameterEntity userParameterEntity)
         {
-            UserAddEntity userAddEntity = new UserAddEntity();
-            await sql.ExecuteEnumerableMultipleAsync<UserAddEntity>("User_SelectForAdd", CommandType.StoredProcedure, 1, userAddEntity, MapAddEntity);
-            return userAddEntity;
+            return await sql.ExecuteResultSetAsync<UserAddEntity>("User_SelectForAdd", CommandType.StoredProcedure, 1, MapAddEntity);
         }
 
         /// <summary>
@@ -137,7 +135,7 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    userAddEntity.Roles.Add(await sql.MapDataDynamicallyAsync<RoleMainEntity>(reader));
+                    userAddEntity.Roles.Add(await sql.MapDataAsync<RoleMainEntity>(reader));
                     break;
             }
         }
@@ -149,12 +147,10 @@ namespace PortfolioManagement.Business.Master
         /// <returns>Edit modes all LOVs data and edit record information</returns>
         public async Task<UserEditEntity> SelectForEdit(UserParameterEntity userParameterEntity)
         {
-            UserEditEntity userEditEntity = new UserEditEntity();
             if (userParameterEntity.Id != 0)
                 sql.AddParameter("Id", userParameterEntity.Id);
 
-            await sql.ExecuteEnumerableMultipleAsync<UserEditEntity>("User_SelectForEdit", CommandType.StoredProcedure, 2, userEditEntity, MapEditEntity);
-            return userEditEntity;
+            return await sql.ExecuteResultSetAsync<UserEditEntity>("User_SelectForEdit", CommandType.StoredProcedure, 2, MapEditEntity);
         }
 
         /// <summary>
@@ -171,7 +167,7 @@ namespace PortfolioManagement.Business.Master
                     userEditEntity.User = MapData(reader);
                     break;
                 case 1:
-                    userEditEntity.Roles.Add(await sql.MapDataDynamicallyAsync<RoleMainEntity>(reader));
+                    userEditEntity.Roles.Add(await sql.MapDataAsync<RoleMainEntity>(reader));
                     break;
             }
         }
@@ -183,7 +179,6 @@ namespace PortfolioManagement.Business.Master
         /// <returns>User grid data</returns>
         public async Task<UserGridEntity> SelectForGrid(UserParameterEntity userParameterEntity)
         {
-            UserGridEntity userGridEntity = new UserGridEntity();
             if (userParameterEntity.FirstName != string.Empty)
                 sql.AddParameter("FirstName", userParameterEntity.FirstName);
             if (userParameterEntity.LastName != string.Empty)
@@ -202,8 +197,7 @@ namespace PortfolioManagement.Business.Master
             sql.AddParameter("SortDirection", userParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", userParameterEntity.PageIndex);
             sql.AddParameter("PageSize", userParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<UserGridEntity>("User_SelectForGrid", CommandType.StoredProcedure, 2, userGridEntity, MapGridEntity);
-            return userGridEntity;
+            return await sql.ExecuteResultSetAsync<UserGridEntity>("User_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         /// <summary>
@@ -217,7 +211,7 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    userGridEntity.Users.Add(await sql.MapDataDynamicallyAsync<UserEntity>(reader));
+                    userGridEntity.Users.Add(await sql.MapDataAsync<UserEntity>(reader));
                     break;
                 case 1:
                     userGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);
@@ -232,7 +226,6 @@ namespace PortfolioManagement.Business.Master
         /// <returns>User grid data and LOV data</returns>
         public async Task<UserListEntity> SelectForList(UserParameterEntity userParameterEntity)
         {
-            UserListEntity userListEntity = new UserListEntity();
             if (userParameterEntity.FirstName != string.Empty)
                 sql.AddParameter("FirstName", userParameterEntity.FirstName);
             if (userParameterEntity.LastName != string.Empty)
@@ -251,8 +244,7 @@ namespace PortfolioManagement.Business.Master
             sql.AddParameter("SortDirection", userParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", userParameterEntity.PageIndex);
             sql.AddParameter("PageSize", userParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<UserListEntity>("User_SelectForList", CommandType.StoredProcedure, 3, userListEntity, MapListEntity);
-            return userListEntity;
+            return await sql.ExecuteResultSetAsync<UserListEntity>("User_SelectForList", CommandType.StoredProcedure, 3, MapListEntity);
         }
 
         /// <summary>
@@ -266,10 +258,10 @@ namespace PortfolioManagement.Business.Master
             switch (resultSet)
             {
                 case 0:
-                    userListEntity.Roles.Add(await sql.MapDataDynamicallyAsync<RoleMainEntity>(reader));
+                    userListEntity.Roles.Add(await sql.MapDataAsync<RoleMainEntity>(reader));
                     break;
                 case 1:
-                    userListEntity.Users.Add(await sql.MapDataDynamicallyAsync<UserEntity>(reader));
+                    userListEntity.Users.Add(await sql.MapDataAsync<UserEntity>(reader));
                     break;
                 case 2:
                     userListEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);

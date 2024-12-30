@@ -1,14 +1,8 @@
-﻿using CommonLibrary.SqlDB;
-using CommonLibrary;
+﻿using AdvancedADO;
 using Microsoft.Extensions.Configuration;
 using PortfolioManagement.Entity.ScriptView;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PortfolioManagement.Repository.ScriptView;
+using System.Data;
 
 namespace PortfolioManagement.Business.ScriptView
 {
@@ -22,9 +16,8 @@ namespace PortfolioManagement.Business.ScriptView
 
         public async Task<ScriptViewRangeChartEntity> SelectForRange(int id)
         {
-            ScriptViewRangeChartEntity scriptViewRangeChartEntity = new ScriptViewRangeChartEntity();
             sql.AddParameter("Id", id);
-            await sql.ExecuteEnumerableMultipleAsync<ScriptViewRangeChartEntity>("ScriptView_SelectForRange", CommandType.StoredProcedure, 2, scriptViewRangeChartEntity, mapData);
+            ScriptViewRangeChartEntity scriptViewRangeChartEntity = await sql.ExecuteResultSetAsync<ScriptViewRangeChartEntity>("ScriptView_SelectForRange", CommandType.StoredProcedure, 2, mapData);
 
             FilterPrices(scriptViewRangeChartEntity);
             return scriptViewRangeChartEntity;
@@ -58,10 +51,10 @@ namespace PortfolioManagement.Business.ScriptView
             switch (resultSet)
             {
                 case 0:
-                    scriptViewRangeChartEntity.Script = await sql.MapDataDynamicallyAsync<ScriptViewRangeEntity>(reader);
+                    scriptViewRangeChartEntity.Script = await sql.MapDataAsync<ScriptViewRangeEntity>(reader);
                     break;
                 case 1:
-                    scriptViewRangeChartEntity.DayPrices.Add(await sql.MapDataDynamicallyAsync<ScriptViewRangeEntity>(reader));
+                    scriptViewRangeChartEntity.DayPrices.Add(await sql.MapDataAsync<ScriptViewRangeEntity>(reader));
                     break;
             }
         }

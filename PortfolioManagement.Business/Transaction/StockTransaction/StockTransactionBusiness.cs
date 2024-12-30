@@ -1,18 +1,10 @@
-﻿using CommonLibrary;
-using CommonLibrary.SqlDB;
+﻿using AdvancedADO;
+using CommonLibrary;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
-using PortfolioManagement.Entity.Account;
-using PortfolioManagement.Entity.Analysis;
 using PortfolioManagement.Entity.Master;
 using PortfolioManagement.Entity.Transaction.StockTransaction;
 using PortfolioManagement.Repository.Transaction;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PortfolioManagement.Business.Transaction.StockTransaction
 {
@@ -86,7 +78,6 @@ namespace PortfolioManagement.Business.Transaction.StockTransaction
         //print data in list 3
         public async Task<StockTransactionGridEntity> SelectForGrid(StockTransactionParameterEntity transactionParameterEntity)
         {
-            StockTransactionGridEntity transactionGridEntity = new StockTransactionGridEntity();
             if (transactionParameterEntity.Id != 0)
                 sql.AddParameter("Id", transactionParameterEntity.Id);
             if (transactionParameterEntity.AccountId != 0)
@@ -106,8 +97,7 @@ namespace PortfolioManagement.Business.Transaction.StockTransaction
             sql.AddParameter("SortDirection", transactionParameterEntity.SortDirection);
             sql.AddParameter("PageIndex", transactionParameterEntity.PageIndex);
             sql.AddParameter("PageSize", transactionParameterEntity.PageSize);
-            await sql.ExecuteEnumerableMultipleAsync<StockTransactionGridEntity>("StockTransaction_SelectForGrid", CommandType.StoredProcedure, 2, transactionGridEntity, MapGridEntity);
-            return transactionGridEntity;
+            return await sql.ExecuteResultSetAsync<StockTransactionGridEntity>("StockTransaction_SelectForGrid", CommandType.StoredProcedure, 2, MapGridEntity);
         }
 
         //for mapping
@@ -116,7 +106,7 @@ namespace PortfolioManagement.Business.Transaction.StockTransaction
             switch (resultSet)
             {
                 case 0:
-                    transactionGridEntity.Stocks.Add(await sql.MapDataDynamicallyAsync<StockTransactionEntity>(reader));
+                    transactionGridEntity.Stocks.Add(await sql.MapDataAsync<StockTransactionEntity>(reader));
                     break;
                 case 1:
                     transactionGridEntity.TotalRecords = MyConvert.ToInt(reader["TotalRecords"]);
@@ -183,10 +173,8 @@ namespace PortfolioManagement.Business.Transaction.StockTransaction
 
         public async Task<StockTransactionListEntity> SelectForList(StockTransactionParameterEntity stockTransactionParameterEntity)
         {
-            StockTransactionListEntity stockTransactionListEntity = new StockTransactionListEntity();
             sql.AddParameter("PmsId", stockTransactionParameterEntity.PmsId);
-            await sql.ExecuteEnumerableMultipleAsync<StockTransactionListEntity>("StockTransaction_SelectForList", CommandType.StoredProcedure, 3, stockTransactionListEntity, MapSelectForListEntity);
-            return stockTransactionListEntity;
+            return await sql.ExecuteResultSetAsync<StockTransactionListEntity>("StockTransaction_SelectForList", CommandType.StoredProcedure, 3, MapSelectForListEntity);
         }
         public async Task MapSelectForListEntity(int resultSet, StockTransactionListEntity stockTransactionListEntity, IDataReader reader)
         {
@@ -194,13 +182,13 @@ namespace PortfolioManagement.Business.Transaction.StockTransaction
             {
 
                 case 0:
-                    stockTransactionListEntity.Accounts.Add(await sql.MapDataDynamicallyAsync<AccountEntity>(reader));
+                    stockTransactionListEntity.Accounts.Add(await sql.MapDataAsync<AccountEntity>(reader));
                     break;
                 case 1:
-                    stockTransactionListEntity.Brokers.Add(await sql.MapDataDynamicallyAsync<BrokerEntity>(reader));
+                    stockTransactionListEntity.Brokers.Add(await sql.MapDataAsync<BrokerEntity>(reader));
                     break;
                 case 2:
-                    stockTransactionListEntity.Scripts.Add(await sql.MapDataDynamicallyAsync<ScriptEntity>(reader));
+                    stockTransactionListEntity.Scripts.Add(await sql.MapDataAsync<ScriptEntity>(reader));
                     break;
             }
         }
@@ -243,10 +231,5 @@ namespace PortfolioManagement.Business.Transaction.StockTransaction
 
             return await sql.ExecuteListAsync<StockTransactionSummaryEntity>("StockTransaction_SelectForSummary", CommandType.StoredProcedure);
         }
-
-        
-
-
-
     }
 }
