@@ -34,11 +34,6 @@ BEGIN
 
         IF @IsSplit = 1
         BEGIN
-            UPDATE	dbo.[Script]
-		    SET		[FaceValue]             = @NewFaceValue,
-                    [Price]					= [Price] * @NewFaceValue / @OldFaceValue
-		    WHERE	 Id						= @ScriptID
-
 		    UPDATE	dbo.[StockTransaction]
 		    SET		[ScriptId]				= @ScriptId		,	
 				    [Qty]					= [Qty] * @OldFaceValue / @NewFaceValue,	
@@ -57,54 +52,42 @@ BEGIN
                     ON      T.TransactionId = ST.Id
 		    WHERE	ST.ScriptId		        = @ScriptID
 
-            UPDATE	dbo.[Portfolio]
-		    SET	    [BuyQty]				= [BuyQty] * @NewFaceValue / @OldFaceValue,
-                    [BuyPrice]              = [BuyPrice] * @OldFaceValue / @NewFaceValue
+	        UPDATE	dbo.[Portfolio]
+		    SET	    [BuyQty]				= [BuyQty] * @OldFaceValue / @NewFaceValue,
+                    [BuyPrice]              = [BuyPrice] * @NewFaceValue / @OldFaceValue,
+					[SellQty]				= [SellQty] * @OldFaceValue / @NewFaceValue,
+                    [SellPrice]             = [SellPrice] * @NewFaceValue / @OldFaceValue
 		    WHERE	ScriptId				= @ScriptID
 
             UPDATE	dbo.[ScriptDaySummary]
 		    SET	    [Price]					= [Price] * @NewFaceValue / @OldFaceValue,
-                    [Volume]				= [Volume] * @NewFaceValue / @OldFaceValue,
-                    [PreviousDay]           = [PreviousDay] * @OldFaceValue / @NewFaceValue,
-                    [Open]                  = [Open] * @OldFaceValue / @NewFaceValue,
-                    [Close]                 = [Close] * @OldFaceValue / @NewFaceValue,
-                    [High]                  = [High] * @OldFaceValue / @NewFaceValue,
-                    [Low]                   = [Low] * @OldFaceValue / @NewFaceValue,
-                    [High52Week]            = [High52Week] * @OldFaceValue / @NewFaceValue,
-                    [Low52Week]             = [Low52Week] * @OldFaceValue / @NewFaceValue
-		    WHERE	ScriptId				= @ScriptID
-
-            UPDATE	dbo.[ScriptLatestValue]
-		    SET	    [Price]					= [Price] * @NewFaceValue / @OldFaceValue,
-                    [Volume]				= [Volume] * @NewFaceValue / @OldFaceValue,
-                    [PreviousDay]           = [PreviousDay] * @OldFaceValue / @NewFaceValue,
-                    [Open]                  = [Open] * @OldFaceValue / @NewFaceValue,
-                    [Close]                 = [Close] * @OldFaceValue / @NewFaceValue,
-                    [High]                  = [High] * @OldFaceValue / @NewFaceValue,
-                    [Low]                   = [Low] * @OldFaceValue / @NewFaceValue,
-                    [High52Week]            = [High52Week] * @OldFaceValue / @NewFaceValue,
-                    [Low52Week]             = [Low52Week] * @OldFaceValue / @NewFaceValue
+                    [Volume]				= [Volume] * @OldFaceValue / @NewFaceValue,
+                    [PreviousDay]           = [PreviousDay] * @NewFaceValue / @OldFaceValue,
+                    [Open]                  = [Open] * @NewFaceValue / @OldFaceValue,
+                    [Close]                 = [Close] * @NewFaceValue / @OldFaceValue,
+                    [High]                  = [High] * @NewFaceValue / @OldFaceValue,
+                    [Low]                   = [Low] * @NewFaceValue / @OldFaceValue,
+                    [High52Week]            = [High52Week] * @NewFaceValue / @OldFaceValue,
+                    [Low52Week]             = [Low52Week] * @NewFaceValue / @OldFaceValue
 		    WHERE	ScriptId				= @ScriptID
         END
 
         IF @IsBonus = 1
         BEGIN
-            UPDATE	dbo.[Script]
-		    SET		[Price]					= [Price] * @ToRatio / @FromRatio
-		    WHERE	Id						= @ScriptID
+			SET		@ToRatio = @ToRatio + @FromRatio
 
 		    UPDATE	dbo.[StockTransaction]
-		    SET		[Qty]					= [Qty] * @FromRatio / @ToRatio,	
-				    [Price]					= [Price] * @ToRatio / @FromRatio	
+		    SET		[Qty]					= [Qty] * @ToRatio / @FromRatio,	
+				    [Price]					= [Price] * @FromRatio / @ToRatio	
 		    WHERE	ScriptId				= @ScriptID
 
             UPDATE	dbo.[ScriptPrice]
-		    SET	    [Price]					= [Price] * @ToRatio / @FromRatio,
-                    [Volume]                = [Volume] * @FromRatio / @ToRatio
+		    SET	    [Price]					= [Price] * @FromRatio / @ToRatio,
+                    [Volume]                = [Volume] * @ToRatio / @FromRatio
 		    WHERE	ScriptId				= @ScriptID
 
             UPDATE	        T
-		    SET	            [Qty]           = T.[Qty] * @FromRatio / @ToRatio
+		    SET	            [Qty]           = T.[Qty] * @ToRatio / @FromRatio
             FROM            dbo.[TransactionProtfolio] T
                 INNER JOIN  dbo.[StockTransaction] ST
                     ON      T.TransactionId = ST.Id
@@ -112,31 +95,21 @@ BEGIN
 
             UPDATE	dbo.[Portfolio]
 		    SET	    [BuyQty]				= [BuyQty] * @ToRatio / @FromRatio,
-                    [BuyPrice]              = [BuyPrice] * @FromRatio / @ToRatio
+                    [BuyPrice]              = [BuyPrice] * @FromRatio / @ToRatio,
+					[SellQty]				= [SellQty] * @ToRatio / @FromRatio,
+                    [SellPrice]             = [SellPrice] * @FromRatio / @ToRatio
 		    WHERE	ScriptId				= @ScriptID
 
             UPDATE	dbo.[ScriptDaySummary]
-		    SET	    [Price]					= [Price] * @ToRatio / @FromRatio,
+		    SET	    [Price]					= [Price] * @FromRatio / @ToRatio,
                     [Volume]				= [Volume] * @ToRatio / @FromRatio,
-                    [PreviousDay]           = [PreviousDay] * @FromRatio / @ToRatio,
-                    [Open]                  = [Open] * @FromRatio / @ToRatio,
-                    [Close]                 = [Close] * @FromRatio / @ToRatio,
-                    [High]                  = [High] * @FromRatio / @ToRatio,
-                    [Low]                   = [Low] * @FromRatio / @ToRatio,
-                    [High52Week]            = [High52Week] * @FromRatio / @ToRatio,
-                    [Low52Week]             = [Low52Week] * @FromRatio / @ToRatio
-		    WHERE	ScriptId				= @ScriptID
-
-            UPDATE	dbo.[ScriptLatestValue]
-		    SET	    [Price]					= [Price] * @ToRatio / @FromRatio,
-                    [Volume]				= [Volume] * @ToRatio / @FromRatio,
-                    [PreviousDay]           = [PreviousDay] * @FromRatio / @ToRatio,
-                    [Open]                  = [Open] * @FromRatio / @ToRatio,
-                    [Close]                 = [Close] * @FromRatio / @ToRatio,
-                    [High]                  = [High] * @FromRatio / @ToRatio,
-                    [Low]                   = [Low] * @FromRatio / @ToRatio,
-                    [High52Week]            = [High52Week] * @FromRatio / @ToRatio,
-                    [Low52Week]             = [Low52Week] * @FromRatio / @ToRatio
+                    [PreviousDay]           = [PreviousDay] * @ToRatio / @FromRatio,
+                    [Open]                  = [Open] * @ToRatio / @FromRatio,
+                    [Close]                 = [Close] * @ToRatio / @FromRatio,
+                    [High]                  = [High] * @ToRatio / @FromRatio,
+                    [Low]                   = [Low] * @ToRatio / @FromRatio,
+                    [High52Week]            = [High52Week] * @ToRatio / @FromRatio,
+                    [Low52Week]             = [Low52Week] * @ToRatio / @FromRatio
 		    WHERE	ScriptId				= @ScriptID
         END
 
@@ -153,4 +126,3 @@ BEGIN
 	END CATCH
 
 END
-
